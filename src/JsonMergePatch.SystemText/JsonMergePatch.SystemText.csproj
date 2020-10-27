@@ -7,4 +7,8 @@
   <ItemGroup>
     <PackageReference Include="System.Text.Json" Version="4.7.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JsonMergePatch.Core\JsonMergePatch.Core.csproj" />
+  </ItemGroup>
 </Project>
