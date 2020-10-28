@@ -33,7 +33,7 @@ stages:
       displayName: 'Ensure Report Generator on unit test projects'
       inputs:
         command: 'custom'
-        projects: '**\*UnitTest*.csproj'
+        projects: '**/*UnitTest*.csproj'
         custom: 'add'
         arguments: 'package ReportGenerator'
 
@@ -41,7 +41,7 @@ stages:
       displayName: 'Ensure coverlet.msbuild on unit test projects'
       inputs:
         command: 'custom'
-        projects: '**\*UnitTest*.csproj'
+        projects: '**/*UnitTest*.csproj'
         custom: 'add'
         arguments: 'package coverlet.msbuild'
 
@@ -55,8 +55,8 @@ stages:
     - task: reportGenerator@4
       displayName: 'Genrate Coverage report'
       inputs:
-        reports: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-        targetdir: '$(Build.SourcesDirectory)\CodeCoverage'
+        reports: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+        targetdir: '$(Build.SourcesDirectory)/CodeCoverage'
         reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
         assemblyfilters: '-xunit*'
     
@@ -64,8 +64,8 @@ stages:
       displayName: 'Publish code coverage report'
       inputs:
         codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
-        reportDirectory: '$(Build.SourcesDirectory)\TestResults\coverage'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+        reportDirectory: '$(Build.SourcesDirectory)/TestResults/coverage'
  
   - job: Build
     displayName: Build
