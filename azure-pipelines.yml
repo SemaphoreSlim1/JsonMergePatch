@@ -1,0 +1,81 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: UnitTests
+    displayName: Unit Tests
+    workspace:
+      clean: all
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: UseDotNet@2
+      displayName: '.Net Core 3.1.x'
+      inputs:
+        version: '3.1.x'
+        packageType: 'sdk'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Ensure Report Generator on unit test projects'
+      inputs:
+        command: 'custom'
+        projects: '**\*UnitTest*.csproj'
+        custom: 'add'
+        arguments: 'package ReportGenerator'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Ensure coverlet.msbuild on unit test projects'
+      inputs:
+        command: 'custom'
+        projects: '**\*UnitTest*.csproj'
+        custom: 'add'
+        arguments: 'package coverlet.msbuild'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: 'test'
+        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+        projects: '**\*UnitTest*.csproj'
+    
+    - task: reportGenerator@4
+      displayName: 'Genrate Coverage report'
+      inputs:
+        reports: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+        targetdir: '$(Build.SourcesDirectory)\CodeCoverage'
+        reporttypes: 'HtmlInline_AzurePipelines;Cobertura;Badges'
+        assemblyfilters: '-xunit*'
+    
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish code coverage report'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'
+        reportDirectory: '$(Build.SourcesDirectory)\TestResults\coverage'
+ 
+  - job: Build
+    displayName: Build
+    workspace:
+      clean: all
+    pool:
+       vmImage: 'ubuntu-latest'
+    steps:
+    - task: UseDotNet@2
+      displayName: '.Net Core 3.1.x'
+      inputs:
+        version: '3.1.x'
+        packageType: 'sdk'
