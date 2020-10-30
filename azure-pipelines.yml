@@ -11,7 +11,8 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-
+  targetCoveragePercentage: 80
+  
 stages:
 - stage: Build
   displayName: Build image
@@ -49,7 +50,7 @@ stages:
       displayName: 'dotnet test'
       inputs:
         command: 'test'
-        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:threshold=$(targetCoveragePercentage) /p:thresholdType=line /p:thresholdStat=total'
         projects: '**/*UnitTest*.csproj'
     
     - task: reportGenerator@4
