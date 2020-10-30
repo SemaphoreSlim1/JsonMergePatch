@@ -1,10 +1,12 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
+  batch: true
+  branches:
+    include:
+     - master
+  paths:
+   exclude:
+     - Readme.md
+     - docs/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -12,6 +14,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   targetCoveragePercentage: 80
+
   
 stages:
 - stage: Build
@@ -50,8 +53,8 @@ stages:
       displayName: 'dotnet test'
       inputs:
         command: 'test'
-        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:threshold=$(targetCoveragePercentage) /p:thresholdType=line /p:thresholdStat=total'
         projects: '**/*UnitTest*.csproj'
+        arguments: '--configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:threshold=$(targetCoveragePercentage) /p:thresholdType=line /p:thresholdStat=total'
     
     - task: reportGenerator@4
       displayName: 'Genrate Coverage report'
@@ -75,8 +78,44 @@ stages:
     pool:
        vmImage: 'ubuntu-latest'
     steps:
-    - task: UseDotNet@2
-      displayName: '.Net Core 3.1.x'
+    # - task: UseDotNet@2
+    #   displayName: '.Net Core 3.1.x'
+    #   inputs:
+    #     version: '3.1.x'
+    #     packageType: 'sdk'
+    - task: gitversion/setup@0
       inputs:
-        version: '3.1.x'
-        packageType: 'sdk'
+        versionSpec: '5.x'
+        
+    - task: gitversion/execute@0
+      displayName: 'Execute Git Version'
+    
+    - task: PowerShell@2
+      displayName: 'List Environment Variables'
+      inputs:
+        targetType: 'inline'
+        script: 'Get-ChildItem env:'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'NuGet Pack'
+      inputs:
+        command: custom
+        custom: 'pack'
+        includesymbols: true
+        projects: '**/*.csproj'
+        arguments: '--configuration $buildConfiguration --output $(Build.ArtifactStagingDirectory)/NuGet /p:PackageVersion=$(gitversion.fullSemVer) /p:AssemblyVersion=$(gitversion.assemblySemVer) /p:FileVersion=$(gitversion.assemblySemFileVer) /p:InformationalVersion=$(gitversion.sha)'
+
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'push'
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*UnitTest*.nupkg'
+        nuGetFeedType: 'internal'
+        publishVstsFeed: '56675ffc-8e70-407c-8f36-09a3e132a5cd'
+
+    # - task: NuGetCommand@2
+    #   inputs:
+    #     command: 'push'
+    #     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    #     nuGetFeedType: 'internal'
+    #     publishVstsFeed: 'matthewethomas/Prerelease'
+    #     allowPackageConflicts: true

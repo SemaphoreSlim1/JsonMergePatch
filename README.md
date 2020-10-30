@@ -1,6 +1,8 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+Json Merge Patch
 
+[![Build Status](https://dev.azure.com/matthewethomas/Public%20Projects/_apis/build/status/JsonMergePatch?branchName=master)](https://dev.azure.com/matthewethomas/Public%20Projects/_build/latest?definitionId=13&branchName=master)
+![code coverage](https://img.shields.io/azure-devops/coverage/matthewethomas/Public%2520Projects/13?style=flat-square)
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
 1.	Installation process
