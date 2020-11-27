@@ -2,19 +2,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mergable", "Mergable\Mergable.csproj", "{BF89B49A-24A9-41DC-B2C0-48F8EF46F91F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.Core", "JsonMergePatch.Core\JsonMergePatch.Core.csproj", "{73CDCAC8-9EF0-45C1-9EFF-4257FA5360AE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.SystemText", "JsonMergePatch.SystemText\JsonMergePatch.SystemText.csproj", "{E9B41969-6DFE-45FE-8672-AAC29A526C93}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.UnitTests", "JsonMergePatch.SystemText.UnitTests\JsonMergePatch.UnitTests.csproj", "{5C851153-1DDB-460A-AE95-541BAEB4CE0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.NewtonsoftJson", "JsonMergePatch.NewtonsoftJson\JsonMergePatch.NewtonsoftJson.csproj", "{1FDE212C-80D0-4A63-964B-F9FA96184ADF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonMergePatch.NewtonsoftJson", "JsonMergePatch.NewtonsoftJson\JsonMergePatch.NewtonsoftJson.csproj", "{1FDE212C-80D0-4A63-964B-F9FA96184ADF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SystemText", "SystemText", "{C461444C-2B4A-4E0B-9B69-FBCF908DB0FD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Newtonsoft", "Newtonsoft", "{F6574CFA-121A-448D-BDB3-84C3382915CD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{97072C80-67FB-4A23-B29F-11C38CABEBF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Newtonsoft.Inbound", "Example.Newtonsoft.Inbound\Example.Newtonsoft.Inbound.csproj", "{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Model", "Example.Model\Example.Model.csproj", "{E8554E87-9A9E-45BF-82B6-164DC365116B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonMergePatch.NewtonsoftJson.AspNet", "JsonMergePatch.NewtonsoftJson.AspNet\JsonMergePatch.NewtonsoftJson.AspNet.csproj", "{F99805A1-FAD0-4855-A5E7-00805AA3ED92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,10 +28,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BF89B49A-24A9-41DC-B2C0-48F8EF46F91F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF89B49A-24A9-41DC-B2C0-48F8EF46F91F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF89B49A-24A9-41DC-B2C0-48F8EF46F91F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF89B49A-24A9-41DC-B2C0-48F8EF46F91F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{73CDCAC8-9EF0-45C1-9EFF-4257FA5360AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{73CDCAC8-9EF0-45C1-9EFF-4257FA5360AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73CDCAC8-9EF0-45C1-9EFF-4257FA5360AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,6 +44,18 @@ Global
 		{1FDE212C-80D0-4A63-964B-F9FA96184ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1FDE212C-80D0-4A63-964B-F9FA96184ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1FDE212C-80D0-4A63-964B-F9FA96184ADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8554E87-9A9E-45BF-82B6-164DC365116B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8554E87-9A9E-45BF-82B6-164DC365116B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8554E87-9A9E-45BF-82B6-164DC365116B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8554E87-9A9E-45BF-82B6-164DC365116B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F99805A1-FAD0-4855-A5E7-00805AA3ED92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F99805A1-FAD0-4855-A5E7-00805AA3ED92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F99805A1-FAD0-4855-A5E7-00805AA3ED92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F99805A1-FAD0-4855-A5E7-00805AA3ED92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -49,6 +63,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{E9B41969-6DFE-45FE-8672-AAC29A526C93} = {C461444C-2B4A-4E0B-9B69-FBCF908DB0FD}
 		{1FDE212C-80D0-4A63-964B-F9FA96184ADF} = {F6574CFA-121A-448D-BDB3-84C3382915CD}
+		{E8A41AEF-D2EC-4AB3-9B6F-9321218C50F3} = {97072C80-67FB-4A23-B29F-11C38CABEBF6}
+		{E8554E87-9A9E-45BF-82B6-164DC365116B} = {97072C80-67FB-4A23-B29F-11C38CABEBF6}
+		{F99805A1-FAD0-4855-A5E7-00805AA3ED92} = {F6574CFA-121A-448D-BDB3-84C3382915CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0B0DA8B4-C8B2-45FD-956D-1AD4762C2876}

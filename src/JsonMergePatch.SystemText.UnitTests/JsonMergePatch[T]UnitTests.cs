@@ -9,7 +9,7 @@ namespace JsonMergePatch.UnitTests
     {
         protected override IJsonMergePatch<T> Create<T>(string json)
         {
-            return NewtonsoftJson.MergePatchDocument.CreateFromJson<T>(json);
+            return NewtonsoftJson.JsonMergePatch.CreateFromJson<T>(json);
         }
 
         [Theory]
@@ -52,7 +52,7 @@ namespace JsonMergePatch.UnitTests
     {
         protected override IJsonMergePatch<T> Create<T>(string json)
         {
-            return SystemText.MergePatchDocument.CreateFromJson<T>(json);
+            return SystemText.JsonMergePatch.CreateFromJson<T>(json);
         }
     }
 

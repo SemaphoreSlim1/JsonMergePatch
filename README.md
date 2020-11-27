@@ -1,22 +1,72 @@
 # Introduction 
-Json Merge Patch
+Json Merge Patch Support for .Net 5
 
 [![Build Status](https://dev.azure.com/matthewethomas/Public%20Projects/_apis/build/status/JsonMergePatch?branchName=master)](https://dev.azure.com/matthewethomas/Public%20Projects/_build/latest?definitionId=13&branchName=master)
 ![code coverage](https://img.shields.io/azure-devops/coverage/matthewethomas/Public%2520Projects/13?style=flat-square)
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Json Merge Patch
+- [RFC 7396](https://tools.ietf.org/html/rfc7396)
+- Backed by Newtonsoft.Json or System.Text.Json - your choice
+- Performs partial resource updates similar to JSON Patch
+- Supports Swagger
+- .Net 5
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+[Here's a introduction to merge patch](http://blog.primarilysoftware.com/2019/json-merge-patch-dot-net/)
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+[Morcatko's JsonMergePatch](https://github.com/Morcatko/Morcatko.AspNetCore.JsonMergePatch)
+
+``` C#
+// C# Object
+public class Person
+{
+    public string FirstName {get; set;}
+    public string LastName {get; set;}
+}
+```
+
+``` JSON
+// JSON Merge Patch
+{
+ "LastName": "Smith"
+}
+```
+
+``` C#
+// Apply all the changes in the patch to your existing model object
+[HttpPatch]
+[Consumes(MergePatchDocument.ContentType)]
+public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
+{
+    ...
+    patch.ApplyTo(existingPerson);
+    ...
+}
+```
+
+``` C#
+//If you need to act based on the presence/absence of a property in the patch
+[HttpPatch]
+[Consumes(MergePatchDocument.ContentType)]
+public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
+{
+    if(lastName.TryGetValue(x => x.LastName, out var ln)
+    {
+        //act accordingly
+    }
+}
+```
+
+``` C#
+// If you need to create a patch document to call a different service
+public void CreatePatch()
+{
+    //simple sets, one property at a time
+    var patch = JsonMergePatch.New();
+    patch.Set(x => x.LastName, "Smith");
+
+    //or, use a builder, which can conditionally set values from other merge patchess
+    var pb = JsonMergePatch.CreateBuilder<Person>();
+    pb.Set(x => x.LastName).ToValue("Smith");
+    var patch = pb.Build();
+}
+```

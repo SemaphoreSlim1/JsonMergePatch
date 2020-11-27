@@ -15,8 +15,10 @@ using System.Threading.Tasks;
 
 namespace JsonMergePatch.NewtonsoftJson
 {
-    public class MergePatchDocument
+    public class JsonMergePatch
     {
+        public const string ContentType = "application/merge-patch+json";
+
         private static readonly Lazy<JsonSerializerSettings> _defaultSerializerSettings = new Lazy<JsonSerializerSettings>(() =>
         {
             var settings = new JsonSerializerSettings
@@ -33,18 +35,23 @@ namespace JsonMergePatch.NewtonsoftJson
             return settings;
         });
 
-        public static IJsonMergePatch<TModel> CreateFromJson<TModel>(JObject root, JsonSerializerSettings serializerSettings = default)
+
+        public static IJsonMergePatch<TModel> Create<TModel>(JObject root, JsonSerializerSettings serializerSettings = default)
         {
             serializerSettings ??= _defaultSerializerSettings.Value;
-            return new MergePatchDocument<TModel>(root, serializerSettings);
+            return new JsonMergePatch<TModel>(root, serializerSettings);
+        }
+
+        public static IJsonMergePatch<TModel> New<TModel>(JsonSerializerSettings serializerSettings = default)
+        {
+            return CreateFromJson<TModel>("{ }", serializerSettings);
         }
 
         public static IJsonMergePatch<TModel> CreateFromJson<TModel>(string json, JsonSerializerSettings serializerSettings = default)
         {
-            var root = JObject.Parse(json);
             serializerSettings ??= _defaultSerializerSettings.Value;
-
-            return new MergePatchDocument<TModel>(root, serializerSettings);
+            var root = JObject.Parse(json);
+            return new JsonMergePatch<TModel>(root, serializerSettings);
         }
 
         public static PatchBuilder<TModel> CreateBuilder<TModel>(JsonSerializerSettings serializerSettings = default)
@@ -52,18 +59,18 @@ namespace JsonMergePatch.NewtonsoftJson
             var root = JObject.Parse("{ }");
             serializerSettings ??= _defaultSerializerSettings.Value;
 
-            var mergePatch = new MergePatchDocument<TModel>(root, serializerSettings);
+            var mergePatch = new JsonMergePatch<TModel>(root, serializerSettings);
             var builder = new PatchBuilder<TModel>(mergePatch);
             return builder;
         }
     }
 
-    public class MergePatchDocument<T> : IJsonMergePatch<T>
+    public class JsonMergePatch<T> : IJsonMergePatch<T>
     {
         private readonly JObject _root;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JsonSerializer _serializer;
-        internal MergePatchDocument(JObject root, JsonSerializerSettings serializerSettings)
+        internal JsonMergePatch(JObject root, JsonSerializerSettings serializerSettings)
         {
             _root = root;
             _serializerSettings = serializerSettings;
@@ -81,7 +88,7 @@ namespace JsonMergePatch.NewtonsoftJson
                 if (valueToken is JArray jArr)
                 {
                     value = jArr.Select(jt => jt as JObject).Where(jo => jo != null)
-                                .Select(jo => new MergePatchDocument<TElement>(jo, _serializerSettings))
+                                .Select(jo => new JsonMergePatch<TElement>(jo, _serializerSettings))
                                 .ToList();
                 }
             }
@@ -100,7 +107,7 @@ namespace JsonMergePatch.NewtonsoftJson
 
                 if (valueToken is JObject newRoot)
                 {
-                    value = new MergePatchDocument<TObjProperty>(newRoot, _serializerSettings);
+                    value = new JsonMergePatch<TObjProperty>(newRoot, _serializerSettings);
                 }
             }
 

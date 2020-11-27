@@ -13,12 +13,12 @@ namespace JsonMergePatch.UnitTests.Builder
     {
         protected override IJsonMergePatch<T> Create<T>(string json)
         {
-            return MergePatchDocument.CreateFromJson<T>(json);
+            return NewtonsoftJson.JsonMergePatch.CreateFromJson<T>(json);
         }
 
         protected override PatchBuilder<T> CreateBuilder<T>()
         {
-            return MergePatchDocument.CreateBuilder<T>();
+            return NewtonsoftJson.JsonMergePatch.CreateBuilder<T>();
         }
     }
     public abstract class MergePatchBuilderTests
