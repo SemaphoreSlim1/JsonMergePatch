@@ -11,9 +11,9 @@ Json Merge Patch Support for .Net 5
 - Supports Swagger
 - .Net 5
 
-[Here's a introduction to merge patch](http://blog.primarilysoftware.com/2019/json-merge-patch-dot-net/)
-
-[Morcatko's JsonMergePatch](https://github.com/Morcatko/Morcatko.AspNetCore.JsonMergePatch)
+Some inspiring projects:
+- [Here's a introduction to merge patch](http://blog.primarilysoftware.com/2019/json-merge-patch-dot-net/)
+- [Morcatko's JsonMergePatch](https://github.com/Morcatko/Morcatko.AspNetCore.JsonMergePatch)
 
 ``` C#
 // C# Object
@@ -32,13 +32,13 @@ public class Person
 ```
 
 ``` C#
-// Apply all the changes in the patch to your existing model object
+// Apply all the changes in the patch to your existing DTO
 [HttpPatch]
 [Consumes(MergePatchDocument.ContentType)]
 public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
 {
     ...
-    patch.ApplyTo(existingPerson);
+    patch.ApplyTo(existingDTO);
     ...
 }
 ```
