@@ -1,5 +1,4 @@
-# Introduction 
-Json Merge Patch Support for .Net 5
+# Json Merge Patch Support for .Net 5
 
 [![Build Status](https://dev.azure.com/matthewethomas/Public%20Projects/_apis/build/status/JsonMergePatch?branchName=master)](https://dev.azure.com/matthewethomas/Public%20Projects/_build/latest?definitionId=13&branchName=master)
 ![code coverage](https://img.shields.io/azure-devops/coverage/matthewethomas/Public%2520Projects/13?style=flat-square)
@@ -15,41 +14,71 @@ Some inspiring projects:
 - [Here's a introduction to merge patch](http://blog.primarilysoftware.com/2019/json-merge-patch-dot-net/)
 - [Morcatko's JsonMergePatch](https://github.com/Morcatko/Morcatko.AspNetCore.JsonMergePatch)
 
+<table>
+<tr>
+<td>C# Object</td>
+<td>JSON</td>
+<td>Resulting C# Object</td>
+</tr>
+<tr>
+<td>
+
+
 ``` C#
-// C# Object
-public class Person
+var person = new Person()
 {
-    public string FirstName {get; set;}
-    public string LastName {get; set;}
-}
+    FirstName = "John",
+    LastName = "Doe"
+};
 ```
 
+
+</td>
+<td>
+
+
 ``` JSON
-// JSON Merge Patch
 {
  "LastName": "Smith"
 }
 ```
 
+
+</td>
+<td>
+
+
+``` C#
+{
+    FirstName = "John",
+    LastName = "Smith"
+}
+```
+
+
+</td>
+</tr>
+</table>
+
 ``` C#
 // Apply all the changes in the patch to your existing DTO
 [HttpPatch]
 [Consumes(MergePatchDocument.ContentType)]
-public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
+public IActionResult Patch([FromBody] IJsonMergePatch<Person> mergePatch)
 {
     ...
-    patch.ApplyTo(existingDTO);
+    mergePatch.ToJsonPatch().ApplyTo(existingDTO);
     ...
 }
 ```
 
 ``` C#
-//If you need to act based on the presence/absence of a property in the patch
+//Acting on the presence/absence of a property in the patch
 [HttpPatch]
 [Consumes(MergePatchDocument.ContentType)]
-public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
+public IActionResult Patch([FromBody] IJsonMergePatch<Person> mergePatch)
 {
-    if(lastName.TryGetValue(x => x.LastName, out var ln)
+    if(mergePatch.TryGetValue(x => x.LastName, out var ln)
     {
         //act accordingly
     }
@@ -61,12 +90,12 @@ public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
 public void CreatePatch()
 {
     //simple sets, one property at a time
-    var patch = JsonMergePatch.New();
-    patch.Set(x => x.LastName, "Smith");
+    var mergePatch = JsonMergePatch.New();
+    mergePatch.Set(x => x.LastName, "Smith");
 
     //or, use a builder, which can conditionally set values from other merge patchess
     var pb = JsonMergePatch.CreateBuilder<Person>();
     pb.Set(x => x.LastName).ToValue("Smith");
-    var patch = pb.Build();
+    var mergePatch = pb.Build();
 }
 ```
