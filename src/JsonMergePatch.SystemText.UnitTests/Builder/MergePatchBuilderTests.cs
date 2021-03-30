@@ -1,6 +1,4 @@
-﻿using JsonMergePatch.Core;
-using JsonMergePatch.Core.Builder;
-using JsonMergePatch.NewtonsoftJson;
+﻿using JsonMergePatch.Builder;
 using JsonMergePatch.UnitTests.ExampleModel;
 using System;
 using System.Collections.Generic;
@@ -18,9 +16,10 @@ namespace JsonMergePatch.UnitTests.Builder
 
         protected override PatchBuilder<T> CreateBuilder<T>()
         {
-            return NewtonsoftJson.JsonMergePatch.CreateBuilder<T>();
+            return new PatchBuilder<T>();
         }
     }
+
     public abstract class MergePatchBuilderTests
     {
         protected abstract IJsonMergePatch<T> Create<T>(string json);
@@ -31,13 +30,14 @@ namespace JsonMergePatch.UnitTests.Builder
         public void Builder_ApplyMapping_ExecutesOnBuild(string sourceJson)
         {
             var source = Create<Person>(sourceJson);
+            var dest = Create<SimplifiedPerson>("{ }");
             var mpb = CreateBuilder<SimplifiedPerson>();
 
             mpb.Set(x => x.FullName).To(source).Property(p => p.FirstName);
 
-            var mergePatch = mpb.Build();
+            mpb.ApplyTo(dest);
 
-            var success = mergePatch.TryGetValue(x => x.FullName, out var fullName);
+            var success = dest.TryGetValue(x => x.FullName, out var fullName);
             Assert.True(success);
             Assert.Equal("Unit Test", fullName);
         }
@@ -49,6 +49,7 @@ namespace JsonMergePatch.UnitTests.Builder
         public void Builder_CustomMapping_ExecutesSourceFunction(string sourceJson, string expectedFullName)
         {
             var source = Create<Person>(sourceJson);
+            var dest = Create<SimplifiedPerson>("{ }");
             var mpb = CreateBuilder<SimplifiedPerson>();
 
             //use a resolver function to provide the value
@@ -64,9 +65,9 @@ namespace JsonMergePatch.UnitTests.Builder
 
                 return string.Join(" ", nameParts);
             });
-            var mergePatch = mpb.Build();
+            mpb.ApplyTo(dest);
 
-            var success = mergePatch.TryGetValue(x => x.FullName, out var fullName);
+            var success = dest.TryGetValue(x => x.FullName, out var fullName);
             Assert.True(success);
             Assert.Equal(expectedFullName, fullName);
         }
@@ -79,6 +80,7 @@ namespace JsonMergePatch.UnitTests.Builder
             var conversionCalled = false;
 
             var source = Create<Person>("{ }");
+            var dest = Create<SimplifiedPerson>("{ }");
             var mpb = CreateBuilder<SimplifiedPerson>();
 
             source.Set(x => x.CreationDate, new DateTime(2020, 1, 1));
@@ -91,10 +93,10 @@ namespace JsonMergePatch.UnitTests.Builder
                                                         return dt?.ToString("yyyy-MM-dd");
                                                     });
 
-            var mergePatch = mpb.Build();
+            mpb.ApplyTo(dest);
 
             Assert.Equal(shouldConvert, conversionCalled);
-            var success = mergePatch.TryGetValue(x => x.Creation, out var createDate);
+            var success = dest.TryGetValue(x => x.Creation, out var createDate);
 
             if (shouldConvert)
             {
@@ -114,6 +116,7 @@ namespace JsonMergePatch.UnitTests.Builder
         public void Builder_ConvertsTypes(string creationDateStr, bool shouldConvert)
         {
             var source = Create<Person>("{ }");
+            var dest = Create<SimplifiedPerson>("{ }");
             var mpb = CreateBuilder<SimplifiedPerson>();
 
             DateTime? creationDate = string.IsNullOrWhiteSpace(creationDateStr) ? null : (DateTime?)DateTime.Parse(creationDateStr);
@@ -123,9 +126,9 @@ namespace JsonMergePatch.UnitTests.Builder
                                                  .OnlyIf().NotNull()
                                                  .UsingConversion(dt => dt?.ToString("yyyy-MM-dd"));
 
-            var mergePatch = mpb.Build();
+            mpb.ApplyTo(dest);
 
-            var success = mergePatch.TryGetValue(x => x.Creation, out var createDate);
+            var success = dest.TryGetValue(x => x.Creation, out var createDate);
 
             if (shouldConvert)
             {
@@ -143,6 +146,7 @@ namespace JsonMergePatch.UnitTests.Builder
         public void Builder_DoesNotHandleImplicitConversion()
         {
             var source = Create<Person>("{ }");
+            var dest = Create<SimplifiedPerson>("{ }");
             var mpb = CreateBuilder<SimplifiedPerson>();
 
             source.Set(x => x.CreationDate, new DateTime(2020, 1, 1));
@@ -151,22 +155,23 @@ namespace JsonMergePatch.UnitTests.Builder
 
             Assert.Throws<InvalidCastException>(() =>
             {
-                mpb.Build();
+                mpb.ApplyTo(dest);
             });
         }
 
         [Fact]
         public void Builder_AutoExpandsUnsetPropertiesToSetValue()
         {
+            var dest = Create<Person>("{ }");
             var mpb = CreateBuilder<Person>();
 
             mpb.Set(x => x.Address.State.Abbreviation).ToValue("TX");
 
-            var mergePatch = mpb.Build();
+            mpb.ApplyTo(dest);
 
-            var addressSuccess = mergePatch.TryGetValue(x => x.Address, out var addr);
-            var stateSuccess = mergePatch.TryGetValue(x => x.Address.State, out var state);
-            var abbrevSuccess = mergePatch.TryGetValue(x => x.Address.State.Abbreviation, out var abbrev);
+            var addressSuccess = dest.TryGetValue(x => x.Address, out var addr);
+            var stateSuccess = dest.TryGetValue(x => x.Address.State, out var state);
+            var abbrevSuccess = dest.TryGetValue(x => x.Address.State.Abbreviation, out var abbrev);
 
             Assert.True(addressSuccess);
             Assert.NotNull(addr);

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace JsonMergePatch.Core.Builder
+namespace JsonMergePatch.Builder
 {
     public class ValueReader<TFrom, TToProperty> : IValueReader<TFrom, TToProperty>
     {

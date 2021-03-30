@@ -6,7 +6,7 @@
 ## Json Merge Patch
 - [RFC 7396](https://tools.ietf.org/html/rfc7396)
 - Backed by Newtonsoft.Json or System.Text.Json - your choice
-- Performs partial resource updates similar to JSON Patch
+- Supports conversion to [JSON Patch](https://benfoster.io/blog/aspnet-core-json-patch-partial-api-updates), which can perform partial resource updates
 - Supports Swagger
 - .Net 5
 

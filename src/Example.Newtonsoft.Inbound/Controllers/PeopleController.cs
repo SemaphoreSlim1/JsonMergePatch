@@ -1,6 +1,5 @@
 ﻿using Example.Model;
-using JsonMergePatch.Core;
-using JsonMergePatch.NewtonsoftJson;
+using JsonMergePatch;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,20 +41,21 @@ namespace Example.Newtonsoft.Inbound.Controllers
         }
 
         [HttpPatch]
-        [Consumes(JsonMergePatch.NewtonsoftJson.JsonMergePatch.ContentType)]
-        public IActionResult Patch([FromBody] IJsonMergePatch<Person> patch)
+        public IActionResult Patch([FromBody] IJsonMergePatch<Person> mergePatch)
         {
+            var jsonPatch = mergePatch.ToJsonPatch();
 
-
-            if (patch.TryGetValue(x => x.FirstName, out var fn))
+            if (mergePatch.TryGetValue(x => x.FirstName, out var fn))
             {
                 //first name was set
             }
 
-            if (patch.TryGetValue(x => x.Address.State.Abbreviation, out var abbvr))
+            if (mergePatch.TryGetValue(x => x.Address.State.Abbreviation, out var abbvr))
             {
                 //abbreviation was set
             }
+
+
 
             return Ok();
         }

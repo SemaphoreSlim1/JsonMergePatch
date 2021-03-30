@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace JsonMergePatch.Core
+namespace JsonMergePatch
 {
     public interface IJsonMergePatch<T>
     {
@@ -36,14 +36,6 @@ namespace JsonMergePatch.Core
         /// <param name="value">The resolved collection</param>
         /// <returns>true, if the object was extracted</returns>
         public bool TryGetArray<TElement>(Expression<Func<T, IEnumerable<TElement>>> collectionExpr, out IReadOnlyList<IJsonMergePatch<TElement>> value);
-
-        /// <summary>
-        /// Sets a property to be a value, forcefully expanding if necessary
-        /// </summary>
-        /// <typeparam name="TProperty">The type of the property to set</typeparam>
-        /// <param name="propertyExpr">The expression path to the property</param>
-        /// <param name="value">The value to set</param>
-        void Set<TProperty>(Expression<Func<T, TProperty>> propertyExpr, TProperty value);
 
         /// <summary>
         /// Get this merge patch, fully deserialized

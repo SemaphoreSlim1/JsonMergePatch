@@ -1,8 +1,6 @@
-﻿using JsonMergePatch.Core;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -11,45 +9,13 @@ using System.Threading.Tasks;
 
 namespace JsonMergePatch.SystemText
 {
-    public class JsonMergePatch
-    {
-        public const string ContentType = "application/merge-patch+json";
 
-        private static readonly Lazy<JsonSerializerOptions> _defaultSerializerOptions = new Lazy<JsonSerializerOptions>(() =>
-        {
-            var opts = new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                PropertyNameCaseInsensitive = true,
-                WriteIndented = Debugger.IsAttached
-            };
-
-            opts.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-            return opts;
-        });
-
-        public static IJsonMergePatch<TModel> Create<TModel>(JsonDocument json, JsonSerializerOptions serializerOptions = default)
-        {
-            serializerOptions ??= _defaultSerializerOptions.Value;
-
-            return new JsonMergePatch<TModel>(json, serializerOptions);
-        }
-
-        public static IJsonMergePatch<TModel> CreateFromJson<TModel>(string json, JsonDocumentOptions documentOptions = default, JsonSerializerOptions serializerOptions = default)
-        {
-            var doc = JsonDocument.Parse(json, documentOptions);
-            serializerOptions ??= _defaultSerializerOptions.Value;
-
-            return new JsonMergePatch<TModel>(doc, serializerOptions);
-        }
-    }
-
-    public class JsonMergePatch<T> : IJsonMergePatch<T>
+    public class SystemTextJsonMergePatch<T> : IJsonMergePatch<T>
     {
         private readonly JsonDocument _json;
         private readonly JsonSerializerOptions _serializerOptions;
 
-        internal JsonMergePatch(JsonDocument json, JsonSerializerOptions serializerOptions)
+        internal SystemTextJsonMergePatch(JsonDocument json, JsonSerializerOptions serializerOptions)
         {
             _json = json;
             _serializerOptions = serializerOptions;
@@ -104,7 +70,7 @@ namespace JsonMergePatch.SystemText
                 { jsonElement.WriteTo(writer); }
 
                 var childDoc = JsonDocument.Parse(bufferWriter.WrittenMemory);
-                value = new JsonMergePatch<TObjProperty>(childDoc, _serializerOptions);
+                value = new SystemTextJsonMergePatch<TObjProperty>(childDoc, _serializerOptions);
 
                 return true;
             }
@@ -141,7 +107,7 @@ namespace JsonMergePatch.SystemText
                     { jsonElement.WriteTo(writer); }
 
                     var childDoc = JsonDocument.Parse(bufferWriter.WrittenMemory);
-                    return new JsonMergePatch<TElement>(childDoc, _serializerOptions);
+                    return new SystemTextJsonMergePatch<TElement>(childDoc, _serializerOptions);
                 }).ToList();
 
                 return true;
@@ -180,13 +146,6 @@ namespace JsonMergePatch.SystemText
             }
 
             return found;
-        }
-
-
-        public void Set<TProperty>(Expression<Func<T, TProperty>> propertyExpr, TProperty value)
-        {
-            //support for setting values using system.text.json is not supported at this time
-            throw new NotSupportedException();
         }
 
         private Stack<string> GetPropertyPath<TProperty>(Expression<Func<T, TProperty>> propertyExpr)

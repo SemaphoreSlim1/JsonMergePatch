@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Example.Model\Example.Model.csproj" />
     <ProjectReference Include="..\JsonMergePatch.NewtonsoftJson.AspNet\JsonMergePatch.NewtonsoftJson.AspNet.csproj" />
   </ItemGroup>
 

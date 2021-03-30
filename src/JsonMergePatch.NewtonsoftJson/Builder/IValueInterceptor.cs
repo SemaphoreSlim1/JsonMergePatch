@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JsonMergePatch.Core.Builder
+namespace JsonMergePatch.Builder
 {
     public interface IValueInterceptor<TFrom, TFromProperty, TToProperty>
     {

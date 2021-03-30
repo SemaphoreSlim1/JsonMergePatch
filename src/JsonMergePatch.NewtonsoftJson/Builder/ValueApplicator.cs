@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace JsonMergePatch.Core.Builder
+namespace JsonMergePatch.Builder
 {
     /// <summary>
     /// Applies a value to a property on a poco
     /// </summary>
     /// <typeparam name="TTo">The type of the object receiveing the value</typeparam>
     /// <typeparam name="TToProperty">The type of the property receiving the value</typeparam>
-    public class ValueApplicator<TTo, TToProperty> : IValueApplicator<TTo, TToProperty>, IValueApplier, IValueResolver<TToProperty>
+    public class ValueApplicator<TTo, TToProperty> : IValueApplicator<TTo, TToProperty>, IValueApplier<TTo>, IValueResolver<TToProperty>
     {
-        protected readonly IJsonMergePatch<TTo> _to;
         protected readonly Expression<Func<TTo, TToProperty>> _toExpr;
 
         protected Func<(bool ShouldApply, TToProperty Value)> _valueResolver;
@@ -18,11 +17,9 @@ namespace JsonMergePatch.Core.Builder
         /// <summary>
         /// Creates a new value applicator
         /// </summary>
-        /// <param name="to">The object to apply the value to</param>
         /// <param name="toExpr">The expression that accessess the property being set</param>
-        public ValueApplicator(IJsonMergePatch<TTo> to, Expression<Func<TTo, TToProperty>> toExpr)
+        public ValueApplicator(Expression<Func<TTo, TToProperty>> toExpr)
         {
-            _to = to;
             _toExpr = toExpr;
         }
 
@@ -63,7 +60,7 @@ namespace JsonMergePatch.Core.Builder
             _valueResolver = retriever;
         }
 
-        public void Apply()
+        public void Apply(IJsonMergePatch<TTo> to)
         {
             if (_valueResolver == null)
             { return; }
@@ -71,7 +68,7 @@ namespace JsonMergePatch.Core.Builder
             var result = _valueResolver();
             if (result.ShouldApply)
             {
-                _to.Set(_toExpr, result.Value);
+                to.Set(_toExpr, result.Value);
             }
         }
     }

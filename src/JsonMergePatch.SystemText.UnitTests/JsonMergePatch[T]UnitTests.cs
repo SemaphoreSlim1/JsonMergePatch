@@ -1,4 +1,3 @@
-using JsonMergePatch.Core;
 using JsonMergePatch.UnitTests.ExampleModel;
 using Xunit;
 

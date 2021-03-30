@@ -2,20 +2,15 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace JsonMergePatch.Core.Builder
+namespace JsonMergePatch.Builder
 {
     public class PatchBuilder<TTo>
     {
-        private readonly IJsonMergePatch<TTo> _to;
-        private readonly List<IValueApplier> _valueApplicators;
+        private readonly List<IValueApplier<TTo>> _valueApplicators;
 
-        public PatchBuilder(IJsonMergePatch<TTo> to)
+        public PatchBuilder()
         {
-            if (to == null)
-            { throw new ArgumentNullException(nameof(to)); }
-
-            _to = to;
-            _valueApplicators = new List<IValueApplier>();
+            _valueApplicators = new List<IValueApplier<TTo>>();
         }
 
         /// <summary>
@@ -25,19 +20,17 @@ namespace JsonMergePatch.Core.Builder
         /// <param name="expr">The expression to the property that is receiving the value</param>        
         public ValueApplicator<TTo, TToProperty> Set<TToProperty>(Expression<Func<TTo, TToProperty>> expr)
         {
-            var valueApplicator = new ValueApplicator<TTo, TToProperty>(_to, expr);
+            var valueApplicator = new ValueApplicator<TTo, TToProperty>(expr);
             _valueApplicators.Add(valueApplicator);
             return valueApplicator;
         }
 
-        public IJsonMergePatch<TTo> Build()
+        public void ApplyTo(IJsonMergePatch<TTo> mergePatch)
         {
             foreach (var applicator in _valueApplicators)
             {
-                applicator.Apply();
+                applicator.Apply(mergePatch);
             }
-
-            return _to;
         }
     }
 }

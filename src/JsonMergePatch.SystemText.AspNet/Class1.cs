@@ -1,23 +1,6 @@
-﻿using JsonMergePatch.Core;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.ObjectPool;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace JsonMergePatch.NewtonsoftJson.AspNet
+namespace JsonMergePatch.SystemText.AspNet
 {
     public class NewtonsoftJsonMergePatchOptionsSetup : IConfigureOptions<MvcOptions>
     {
@@ -66,7 +49,7 @@ namespace JsonMergePatch.NewtonsoftJson.AspNet
 
     }
 
-    internal class MergePatchInputFormatter : NewtonsoftJsonInputFormatter
+    internal class MergePatchInputFormatter : SystemTextJsonInputFormatter
     {
         private readonly Lazy<ModelMetadata> _modelMetadata;
 

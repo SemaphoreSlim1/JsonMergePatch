@@ -1,12 +1,7 @@
-﻿using JsonMergePatch.Core;
-using JsonMergePatch.Core.Builder;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -15,62 +10,12 @@ using System.Threading.Tasks;
 
 namespace JsonMergePatch.NewtonsoftJson
 {
-    public class JsonMergePatch
+    public class NewtonsoftJsonMergePatch<T> : IJsonMergePatch<T>
     {
-        public const string ContentType = "application/merge-patch+json";
-
-        private static readonly Lazy<JsonSerializerSettings> _defaultSerializerSettings = new Lazy<JsonSerializerSettings>(() =>
-        {
-            var settings = new JsonSerializerSettings
-            {
-                Formatting = Debugger.IsAttached ? Formatting.Indented : Formatting.None,
-                ContractResolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new CamelCaseNamingStrategy()
-                }
-            };
-
-            settings.Converters.Add(new StringEnumConverter());
-
-            return settings;
-        });
-
-
-        public static IJsonMergePatch<TModel> Create<TModel>(JObject root, JsonSerializerSettings serializerSettings = default)
-        {
-            serializerSettings ??= _defaultSerializerSettings.Value;
-            return new JsonMergePatch<TModel>(root, serializerSettings);
-        }
-
-        public static IJsonMergePatch<TModel> New<TModel>(JsonSerializerSettings serializerSettings = default)
-        {
-            return CreateFromJson<TModel>("{ }", serializerSettings);
-        }
-
-        public static IJsonMergePatch<TModel> CreateFromJson<TModel>(string json, JsonSerializerSettings serializerSettings = default)
-        {
-            serializerSettings ??= _defaultSerializerSettings.Value;
-            var root = JObject.Parse(json);
-            return new JsonMergePatch<TModel>(root, serializerSettings);
-        }
-
-        public static PatchBuilder<TModel> CreateBuilder<TModel>(JsonSerializerSettings serializerSettings = default)
-        {
-            var root = JObject.Parse("{ }");
-            serializerSettings ??= _defaultSerializerSettings.Value;
-
-            var mergePatch = new JsonMergePatch<TModel>(root, serializerSettings);
-            var builder = new PatchBuilder<TModel>(mergePatch);
-            return builder;
-        }
-    }
-
-    public class JsonMergePatch<T> : IJsonMergePatch<T>
-    {
-        private readonly JObject _root;
+        internal readonly JObject _root;
         private readonly JsonSerializerSettings _serializerSettings;
         private readonly JsonSerializer _serializer;
-        internal JsonMergePatch(JObject root, JsonSerializerSettings serializerSettings)
+        internal NewtonsoftJsonMergePatch(JObject root, JsonSerializerSettings serializerSettings)
         {
             _root = root;
             _serializerSettings = serializerSettings;
@@ -88,7 +33,7 @@ namespace JsonMergePatch.NewtonsoftJson
                 if (valueToken is JArray jArr)
                 {
                     value = jArr.Select(jt => jt as JObject).Where(jo => jo != null)
-                                .Select(jo => new JsonMergePatch<TElement>(jo, _serializerSettings))
+                                .Select(jo => new NewtonsoftJsonMergePatch<TElement>(jo, _serializerSettings))
                                 .ToList();
                 }
             }
@@ -107,7 +52,7 @@ namespace JsonMergePatch.NewtonsoftJson
 
                 if (valueToken is JObject newRoot)
                 {
-                    value = new JsonMergePatch<TObjProperty>(newRoot, _serializerSettings);
+                    value = new NewtonsoftJsonMergePatch<TObjProperty>(newRoot, _serializerSettings);
                 }
             }
 
@@ -132,21 +77,8 @@ namespace JsonMergePatch.NewtonsoftJson
             return found;
         }
 
-        public void Set<TProperty>(Expression<Func<T, TProperty>> propertyExpr, TProperty value)
-        {
-            if (TryGetValueToken(propertyExpr, forceExpand: true, out var valueToken))
-            {
-                if (valueToken.Parent is JProperty jProp)
-                {
-                    if (value == null)
-                    { jProp.Value = JValue.CreateNull(); }
-                    else
-                    { jProp.Value = JToken.FromObject(value); }
-                }
-            }
-        }
 
-        private bool TryGetValueToken<TProperty>(Expression<Func<T, TProperty>> propertyExpr, bool forceExpand, out JToken token)
+        internal bool TryGetValueToken<TProperty>(Expression<Func<T, TProperty>> propertyExpr, bool forceExpand, out JToken token)
         {
             token = default!;
             var propertyPath = GetPropertyPath(propertyExpr);
